@@ -1,0 +1,53 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: user-ms
+  
+  # Configuración de la base de datos H2
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+  
+  # Configuración de H2 Console (para desarrollo)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  # Configuración de JPA
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  
+  # Configuración de auditoría
+  data:
+    jpa:
+      repositories:
+        enabled: true
+
+# Configuración de JWT
+jwt:
+  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970 # Clave secreta para firmar JWT (en producción usar variable de entorno)
+  expiration: 86400000 # 24 horas en milisegundos
+
+# Configuración de microservicios
+microservices:
+  auth-service:
+    url: http://localhost:8079
+
+# Configuración de logging
+logging:
+  level:
+    com.microservices: DEBUG
+    com.microservices.service.AuthorizationService: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

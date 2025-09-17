@@ -22,6 +22,8 @@
 		<developer/>
 	</developers>
     <modules>
+        <module>auth-module</module>
+        <module>product-ms</module>
         <module>user-ms</module>
     </modules>
     <scm>
