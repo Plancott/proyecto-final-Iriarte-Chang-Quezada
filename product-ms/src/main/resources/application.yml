@@ -39,6 +39,14 @@ microservices:
   auth-ms:
     url: http://localhost:8079
 
+# Configuración de Cloudinary
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME:dftuya11k}
+  api-key: ${CLOUDINARY_API_KEY:987835277476446}
+  api-secret: ${CLOUDINARY_API_SECRET:aPnzUON0lQthnsJW1sYNbLUNcH8}
+  secure: true
+  upload-preset: ${CLOUDINARY_UPLOAD_PRESET:product-images}
+
 # Configuración de logging
 logging:
   level:

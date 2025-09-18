@@ -312,4 +312,14 @@ public class ProductServiceImpl implements ProductService {
         Product savedProduct = productRepository.save(product);
         return productMapper.toResponseDTO(savedProduct);
     }
+    
+    @Override
+    public ProductResponseDTO updateProductImage(Long id, String imageUrl) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Producto no encontrado con ID: " + id));
+        
+        product.setImageUrl(imageUrl);
+        Product savedProduct = productRepository.save(product);
+        return productMapper.toResponseDTO(savedProduct);
+    }
 }

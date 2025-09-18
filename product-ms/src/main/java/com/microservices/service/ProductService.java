@@ -60,4 +60,7 @@ public interface ProductService {
     // Cambio de estado
     ProductResponseDTO activateProduct(Long id);
     ProductResponseDTO deactivateProduct(Long id);
+    
+    // Gestión de imágenes
+    ProductResponseDTO updateProductImage(Long id, String imageUrl);
 }

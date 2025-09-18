@@ -3,6 +3,7 @@ package com.microservices.controller;
 import com.microservices.dto.*;
 import com.microservices.entity.ProductStatus;
 import com.microservices.service.ProductService;
+import com.microservices.service.CloudinaryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -22,6 +24,7 @@ import java.util.List;
 public class ProductController {
     
     private final ProductService productService;
+    private final CloudinaryService cloudinaryService;
     
     // ==================== CRUD BÁSICO ====================
     
@@ -501,5 +504,124 @@ public class ProductController {
             @RequestParam(defaultValue = "asc") String sortDirection) {
         
         return getProductsByStatus(ProductStatus.ACTIVE, page, size, sortBy, sortDirection);
+    }
+    
+    // ==================== GESTIÓN DE IMÁGENES ====================
+    
+    /**
+     * Subir imagen a un producto existente
+     * POST /api/products/{id}/upload-image
+     * Content-Type: multipart/form-data
+     * Parámetros:
+     * - id: ID del producto
+     * - file: archivo de imagen (JPEG, PNG, GIF, WebP, máx 5MB)
+     * Retorna: ProductResponseDTO con la URL de la imagen actualizada
+     */
+    @PostMapping("/{id}/upload-image")
+    public ResponseEntity<ProductResponseDTO> uploadProductImage(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file) {
+        
+        try {
+            // Subir imagen a Cloudinary
+            String imageUrl = cloudinaryService.uploadProductImage(file);
+            
+            // Actualizar producto con la nueva URL de imagen
+            ProductResponseDTO response = productService.updateProductImage(id, imageUrl);
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest()
+                    .header("X-Error-Message", e.getMessage())
+                    .build();
+        }
+    }
+    
+    /**
+     * Eliminar imagen de un producto
+     * DELETE /api/products/{id}/image
+     * Parámetros:
+     * - id: ID del producto
+     * Retorna: ProductResponseDTO con la imagen eliminada
+     */
+    @DeleteMapping("/{id}/image")
+    public ResponseEntity<ProductResponseDTO> deleteProductImage(@PathVariable Long id) {
+        try {
+            // Obtener producto actual para extraer URL de imagen
+            ProductResponseDTO currentProduct = productService.getProductById(id);
+            
+            if (currentProduct.getImageUrl() != null && !currentProduct.getImageUrl().isEmpty()) {
+                // Extraer public ID de Cloudinary
+                String publicId = cloudinaryService.extractPublicId(currentProduct.getImageUrl());
+                
+                if (publicId != null) {
+                    // Eliminar imagen de Cloudinary
+                    cloudinaryService.deleteImage(publicId);
+                }
+            }
+            
+            // Actualizar producto eliminando la URL de imagen
+            ProductResponseDTO response = productService.updateProductImage(id, null);
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest()
+                    .header("X-Error-Message", e.getMessage())
+                    .build();
+        }
+    }
+    
+    /**
+     * Crear producto con imagen
+     * POST /api/products/with-image
+     * Content-Type: multipart/form-data
+     * Parámetros:
+     * - name: nombre del producto
+     * - description: descripción del producto
+     * - categoryId: ID de la categoría
+     * - brandId: ID de la marca
+     * - unitPrice: precio unitario
+     * - file: archivo de imagen (opcional)
+     * Retorna: ProductResponseDTO con el producto creado
+     */
+    @PostMapping("/with-image")
+    public ResponseEntity<ProductResponseDTO> createProductWithImage(
+            @RequestParam("name") String name,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam("categoryId") Long categoryId,
+            @RequestParam("brandId") Long brandId,
+            @RequestParam("unitPrice") BigDecimal unitPrice,
+            @RequestParam(value = "file", required = false) MultipartFile file) {
+        
+        try {
+            String imageUrl = null;
+            
+            // Subir imagen si se proporciona
+            if (file != null && !file.isEmpty()) {
+                imageUrl = cloudinaryService.uploadProductImage(file);
+            }
+            
+            // Crear DTO de producto
+            ProductRequestDTO requestDTO = ProductRequestDTO.builder()
+                    .name(name)
+                    .description(description)
+                    .categoryId(categoryId)
+                    .brandId(brandId)
+                    .unitPrice(unitPrice)
+                    .imageUrl(imageUrl)
+                    .build();
+            
+            // Crear producto
+            ProductResponseDTO response = productService.createProduct(requestDTO);
+            
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+            
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest()
+                    .header("X-Error-Message", e.getMessage())
+                    .build();
+        }
     }
 }
