@@ -82,6 +82,11 @@ public class StockController {
         return ResponseEntity.ok(stockMapper.toStockResponseDto(stockService.findById(id)));
     }
 
+    @GetMapping("/totalProduct/{id}")
+    public ResponseEntity<StockFindProductDto> findByProductId(@PathVariable Long id) {
+        return ResponseEntity.ok(stockService.findByProductId(id));
+    }
+
     /*
         - Pide los datos de salida de stock de un producto en especifico
         {
@@ -105,6 +110,8 @@ public class StockController {
                 .body(stockService.restarStock(solicitudes));
     }
 
+
+    //----------
     //Eliminar un stock
     @PatchMapping("/{id}")
     public ResponseEntity<StockResponseDto> patchStock(
@@ -113,8 +120,5 @@ public class StockController {
         return ResponseEntity.ok(stockMapper.toStockResponseDto(stockService.updateById(id, stockRequestDto)));
     }
 
-    @GetMapping("/totalProduct/{id}")
-    public ResponseEntity<StockFindProductDto> findByProductId(@PathVariable Long id) {
-        return ResponseEntity.ok(stockService.findByProductId(id));
-    }
+
 }

@@ -52,6 +52,7 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public Store updateStoreById(Long id, Store store) {
+        System.out.println(store);
         Store storeActual = findStoreById(id);
         storeActual.setName(store.getName());
         storeActual.setCapacity(storeActual.getCapacity());

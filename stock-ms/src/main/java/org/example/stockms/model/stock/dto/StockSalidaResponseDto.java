@@ -13,6 +13,6 @@ public class StockSalidaResponseDto {
     private Long storeId;        // Id del almacén
     //private Long stockId;        // Id del stock
     private Integer cantidadRetirada; // Cantidad que se retiró
-    private Integer cantidadRestante; // Cantidad que quedó en stock
+    private Integer capacidadRestante; // Cantidad que quedó en stock
     private Long productId;
 }

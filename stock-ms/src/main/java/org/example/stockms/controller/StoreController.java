@@ -20,8 +20,6 @@ public class StoreController {
     private final StoreService storeService;
     private final StoreMapper storeMapper;
 
-
-
     /*
     Retorna una lista de {
         private Integer id; -> El id del almacen
