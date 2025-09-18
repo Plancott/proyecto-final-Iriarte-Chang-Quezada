@@ -1,6 +1,7 @@
 package org.example.stockms.service.store;
 
 import lombok.AllArgsConstructor;
+import org.example.stockms.exception.StoreNotEmptyException;
 import org.example.stockms.model.stock.Stock;
 import org.example.stockms.model.store.Store;
 import org.example.stockms.model.store.dto.StoreCantidadProductoAlmacenDto;
@@ -26,10 +27,11 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public List<Store> saveStore(Integer cantidadStores) {
         List<Store> stores = new ArrayList<>();
+        long totalExistentes = storeRepository.count();
 
         for (int i = 1; i <= cantidadStores; i++) {
             Store store = new Store();
-            store.setName("store" + i);     // Nombre: store1, store2, store3...
+            store.setName("store" + (totalExistentes + i));     // Nombre: store1, store2, store3...
             store.setCapacity(0);           // Capacidad inicial en 0
             store.setCapacityTotal(100);    // Capacidad máxima definida
             stores.add(store);
@@ -60,7 +62,7 @@ public class StoreServiceImpl implements StoreService {
                 .orElseThrow(() -> new RuntimeException("Store no encontrada"));
 
         if (!store.getStocks().isEmpty()) {
-            throw new RuntimeException("No se puede eliminar: existen stocks asociados");
+            throw new StoreNotEmptyException(store.getId(),store.getCapacity());
         }
 
         storeRepository.deleteById(id);

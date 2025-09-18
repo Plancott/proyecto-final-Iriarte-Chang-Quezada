@@ -46,26 +46,25 @@ public class StoreController {
         return ResponseEntity.ok(storeService.findAllStoreProductosDto());
     }
 
-//    /* -Crea un nuevo almacen(Store)pide los datos
-//    {private String name; -> El nombre el almacen
-//        private Integer capacityTotal; -> La capacidad maxima}
-//
-//        -Devuelve un {
-//        private Integer id; -> El id del almacen
-//        private String name; -> El nombre del almacen
-//        private Integer capacity; -> La capacidad ocupada
-//        private Integer capacityTotal; -> La capacidad total
-//        private List<Stock> stocks; -> Lista de stocks registrados en el almacen
-//        }
-//    */
-//    @PostMapping
-//    public ResponseEntity<StoreResponseDto> createStore(@RequestBody StoreRequestDto storeRequestDto) {
-//        return ResponseEntity.status(HttpStatus.CREATED).body(storeMapper.toStoreResponseDto(storeService.saveStore(storeMapper.toStore(storeRequestDto))));
-//    }
-@PostMapping("/{cantidad}")
-public ResponseEntity<List<StoreResponseDto>> createStore(@PathVariable Integer cantidad) {
-
-    return ResponseEntity.status(HttpStatus.CREATED).body(storeMapper.toListStoreResponseDto(storeService.saveStore(cantidad)));
+    //    /* -Crea un nuevo almacen(Store)pide los datos
+    //    {private String name; -> El nombre el almacen
+    //        private Integer capacityTotal; -> La capacidad maxima}
+    //
+    //        -Devuelve un {
+    //        private Integer id; -> El id del almacen
+    //        private String name; -> El nombre del almacen
+    //        private Integer capacity; -> La capacidad ocupada
+    //        private Integer capacityTotal; -> La capacidad total
+    //        private List<Stock> stocks; -> Lista de stocks registrados en el almacen
+    //        }
+    //    */
+    //    @PostMapping
+    //    public ResponseEntity<StoreResponseDto> createStore(@RequestBody StoreRequestDto storeRequestDto) {
+    //        return ResponseEntity.status(HttpStatus.CREATED).body(storeMapper.toStoreResponseDto(storeService.saveStore(storeMapper.toStore(storeRequestDto))));
+    //    }
+    @PostMapping("/{cantidad}")
+    public ResponseEntity<List<StoreResponseDto>> createStore(@PathVariable Integer cantidad) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(storeMapper.toListStoreResponseDto(storeService.saveStore(cantidad)));
 }
     //Eliminamos un store por id
     @DeleteMapping("/{id}")
