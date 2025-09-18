@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>auth-module</artifactId>
+    <artifactId>auth-ms</artifactId>
 
     <dependencies>
         <dependency>
