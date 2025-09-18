@@ -19,9 +19,6 @@ public interface StockService {
     //Eliminar un stock
     void deleteById(Long id);
 
-    //Actualizar un stock
-    Stock updateById(Long id,StockRequestDto stockRequestDto);
-
     //Buscar entradas y salidad de un producto en especificoy saber cuanto hay en total
     StockFindProductDto findByProductId(Long productId);
 }

@@ -3,12 +3,13 @@ package org.example.stockms.model.stock;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 import org.example.stockms.model.store.Store;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-
+@ToString
 @Data
 @Entity
 @EntityListeners(AuditingEntityListener.class)

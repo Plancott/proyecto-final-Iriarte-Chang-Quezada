@@ -111,14 +111,5 @@ public class StockController {
     }
 
 
-    //----------
-    //Eliminar un stock
-    @PatchMapping("/{id}")
-    public ResponseEntity<StockResponseDto> patchStock(
-            @PathVariable Long id,
-            @RequestBody StockRequestDto stockRequestDto) {
-        return ResponseEntity.ok(stockMapper.toStockResponseDto(stockService.updateById(id, stockRequestDto)));
-    }
-
 
 }

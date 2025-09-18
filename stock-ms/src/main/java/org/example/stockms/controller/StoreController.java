@@ -3,6 +3,7 @@ package org.example.stockms.controller;
 import lombok.AllArgsConstructor;
 import org.apache.coyote.Response;
 import org.example.stockms.mapper.StoreMapper;
+import org.example.stockms.model.store.Store;
 import org.example.stockms.model.store.dto.StoreCantidadProductoAlmacenDto;
 import org.example.stockms.model.store.dto.StoreRequestDto;
 import org.example.stockms.model.store.dto.StoreResponseDto;
@@ -45,23 +46,27 @@ public class StoreController {
         return ResponseEntity.ok(storeService.findAllStoreProductosDto());
     }
 
-    /* -Crea un nuevo almacen(Store)pide los datos
-    {private String name; -> El nombre el almacen
-        private Integer capacityTotal; -> La capacidad maxima}
+//    /* -Crea un nuevo almacen(Store)pide los datos
+//    {private String name; -> El nombre el almacen
+//        private Integer capacityTotal; -> La capacidad maxima}
+//
+//        -Devuelve un {
+//        private Integer id; -> El id del almacen
+//        private String name; -> El nombre del almacen
+//        private Integer capacity; -> La capacidad ocupada
+//        private Integer capacityTotal; -> La capacidad total
+//        private List<Stock> stocks; -> Lista de stocks registrados en el almacen
+//        }
+//    */
+//    @PostMapping
+//    public ResponseEntity<StoreResponseDto> createStore(@RequestBody StoreRequestDto storeRequestDto) {
+//        return ResponseEntity.status(HttpStatus.CREATED).body(storeMapper.toStoreResponseDto(storeService.saveStore(storeMapper.toStore(storeRequestDto))));
+//    }
+@PostMapping("/{cantidad}")
+public ResponseEntity<List<StoreResponseDto>> createStore(@PathVariable Integer cantidad) {
 
-        -Devuelve un {
-        private Integer id; -> El id del almacen
-        private String name; -> El nombre del almacen
-        private Integer capacity; -> La capacidad ocupada
-        private Integer capacityTotal; -> La capacidad total
-        private List<Stock> stocks; -> Lista de stocks registrados en el almacen
-        }
-    */
-    @PostMapping
-    public ResponseEntity<StoreResponseDto> createStore(@RequestBody StoreRequestDto storeRequestDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(storeMapper.toStoreResponseDto(storeService.saveStore(storeMapper.toStore(storeRequestDto))));
-    }
-
+    return ResponseEntity.status(HttpStatus.CREATED).body(storeMapper.toListStoreResponseDto(storeService.saveStore(cantidad)));
+}
     //Eliminamos un store por id
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStore(@PathVariable Long id){

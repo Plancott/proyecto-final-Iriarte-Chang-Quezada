@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface StoreService {
     //Crear almacen
-    Store saveStore(Store store);
+    List<Store> saveStore(Integer cantidadStores);
 
     //Obtener todos los almacenes
     List<Store> findAllStores();

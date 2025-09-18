@@ -8,6 +8,7 @@ import org.example.stockms.model.store.dto.StoreProductQuantityDto;
 import org.example.stockms.repository.StoreRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,10 +19,26 @@ public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
 
     //Crea un nuevo almacen y devuelve los datos del mismo
+//    @Override
+//    public Store saveStore(Store store) {
+//        return storeRepository.save(store);
+//    }
     @Override
-    public Store saveStore(Store store) {
-        return storeRepository.save(store);
+    public List<Store> saveStore(Integer cantidadStores) {
+        List<Store> stores = new ArrayList<>();
+
+        for (int i = 1; i <= cantidadStores; i++) {
+            Store store = new Store();
+            store.setName("store" + i);     // Nombre: store1, store2, store3...
+            store.setCapacity(0);           // Capacidad inicial en 0
+            store.setCapacityTotal(100);    // Capacidad máxima definida
+            stores.add(store);
+        }
+
+        // Guardamos todos en una sola operación
+        return storeRepository.saveAll(stores);
     }
+
 
     //Devuelve todos los almacenes con sus datos
     @Override

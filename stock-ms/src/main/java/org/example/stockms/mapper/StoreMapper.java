@@ -17,4 +17,7 @@ public interface StoreMapper {
 
     //StoreResponseDto <- Store
     StoreResponseDto toStoreResponseDto(Store store);
+
+    //
+    List<StoreResponseDto> toListStoreResponseDto(List<Store> stores);
 }

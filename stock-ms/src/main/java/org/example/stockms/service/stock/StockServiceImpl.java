@@ -109,6 +109,7 @@ public class StockServiceImpl implements StockService {
         return stockRepository.saveAll(allStocksToSave);
     }
 
+
     //Devuelve todos los stock
     @Override
     public List<Stock> findAll() {
@@ -156,81 +157,6 @@ public class StockServiceImpl implements StockService {
         );
     }
 
-//    @Override
-//    @Transactional
-//    public List<StockSalidaResponseDto> restarStock(List<StockSalidaRequestDto> solicitudes) {
-//        List<StockSalidaResponseDto> respuestaGlobal = new ArrayList<>();
-//
-//        for (StockSalidaRequestDto solicitud : solicitudes) {
-//            System.out.println(solicitud);
-//            int restante = solicitud.getQuantity();
-//            List<StockSalidaResponseDto> respuestaParcial = new ArrayList<>();
-//
-//            // Obtenemos todos los stocks del producto solicitado
-//            List<Stock> stocksOrdenados = storeRepository.findAll().stream()
-//                    .flatMap(store -> store.getStocks().stream()
-//                            .filter(stock -> stock.getProductId().equals(solicitud.getProductId())
-//                                    && stock.getState().equalsIgnoreCase("entrada")
-//                                    && stock.getQuantity() > 0))
-//                    .sorted(Comparator.comparingInt(Stock::getQuantity))
-//                    .toList();
-//
-//            for (Stock stockEntrada : stocksOrdenados) {
-//                if (restante <= 0) break;
-//
-//                Store store = stockEntrada.getStore();
-//
-//                // Entradas de este producto en este almacén
-//                int entradas = store.getStocks().stream()
-//                        .filter(s -> s.getProductId().equals(solicitud.getProductId())
-//                                && s.getState().equalsIgnoreCase("entrada"))
-//                        .mapToInt(Stock::getQuantity)
-//                        .sum();
-//
-//                // Salidas de este producto en este almacén
-//                int salidas = store.getStocks().stream()
-//                        .filter(s -> s.getProductId().equals(solicitud.getProductId())
-//                                && s.getState().equalsIgnoreCase("salida"))
-//                        .mapToInt(Stock::getQuantity)
-//                        .sum();
-//
-//                int disponible = entradas - salidas;
-//                if (disponible <= 0) continue;
-//
-//                int cantidadRetirar = Math.min(disponible, restante);
-//
-//                // Creamos movimiento de salida
-//                Stock stockSalida = new Stock();
-//                stockSalida.setQuantity(cantidadRetirar);
-//                stockSalida.setState("salida");
-//                stockSalida.setProductId(stockEntrada.getProductId());
-//                stockSalida.setStore(store);
-//                stockRepository.save(stockSalida);
-//
-//                int nuevaCapacidad = entradas - (salidas + cantidadRetirar);
-//                store.setCapacity(nuevaCapacidad);
-//                storeRepository.save(store);
-//
-//                restante -= cantidadRetirar;
-//
-//                respuestaParcial.add(new StockSalidaResponseDto(
-//                        store.getId(),
-//                        cantidadRetirar,
-//                        nuevaCapacidad,
-//                        stockEntrada.getProductId()
-//                ));
-//            }
-//
-//            if (restante > 0) {
-//                throw new RuntimeException("No hay suficiente stock del producto "
-//                        + solicitud.getProductId() + ". Faltan " + restante + " unidades.");
-//            }
-//
-//            respuestaGlobal.addAll(respuestaParcial);
-//        }
-//
-//        return respuestaGlobal;
-//    }
 
     @Override
     @Transactional
@@ -238,22 +164,20 @@ public class StockServiceImpl implements StockService {
         List<StockSalidaResponseDto> respuestaGlobal = new ArrayList<>();
 
         for (StockSalidaRequestDto solicitud : solicitudes) {
-            int restante = solicitud.getQuantity();
+            int restante = solicitud.getQuantity(); // cuánto falta retirar del producto solicitado
 
-            // 🔹 Buscar todos los stocks de entrada del producto ordenados por fecha (FIFO)
+            // Buscar todos los stocks de ENTRADA de ese producto en TODOS los almacenes, ordenados FIFO
             List<Stock> entradasProducto = storeRepository.findAll().stream()
                     .flatMap(store -> store.getStocks().stream()
-                            .filter(stock -> stock.getProductId().equals(solicitud.getProductId())
-                                    && stock.getState().equalsIgnoreCase("entrada")))
+                            .filter(stock -> stock.getProductId().equals(solicitud.getProductId())))
                     .sorted(Comparator.comparing(Stock::getDate)) // más antiguo primero
                     .toList();
 
             for (Stock entrada : entradasProducto) {
-                if (restante <= 0) break;
+                if (restante <= 0) break; // si ya retiramos todo lo solicitado, salimos
+                Store store = entrada.getStore(); // almacén asociado a esta entrada
 
-                Store store = entrada.getStore();
-
-                // calcular stock disponible real en este store
+                // Calcular stock disponible real de ese producto en este almacén
                 int entradas = store.getStocks().stream()
                         .filter(s -> s.getProductId().equals(solicitud.getProductId())
                                 && s.getState().equalsIgnoreCase("entrada"))
@@ -265,37 +189,52 @@ public class StockServiceImpl implements StockService {
                         .mapToInt(Stock::getQuantity).sum();
 
                 int disponible = entradas - salidas;
-                if (disponible <= 0) continue;
+                if (disponible <= 0) continue; // nada disponible en este store → pasar al siguiente
 
+                // Determinar cuánto retirar de este almacén
                 int cantidadRetirar = Math.min(disponible, restante);
 
-                // registrar salida
+                // Registrar un nuevo movimiento de SALIDA
                 Stock stockSalida = new Stock();
                 stockSalida.setQuantity(cantidadRetirar);
                 stockSalida.setState("salida");
                 stockSalida.setProductId(solicitud.getProductId());
                 stockSalida.setStore(store);
                 stockRepository.save(stockSalida);
+                store.getStocks().add(stockSalida);
 
-                // 🔹 recalcular capacidad ocupada total en el store (todos los productos)
+                // -----------------------------------------------------
+                // Aquí recalculamos la capacidad REAL del store
+                // -----------------------------------------------------
+
+                // Total de entradas (todos los productos) en este store
                 int entradasStore = store.getStocks().stream()
                         .filter(s -> s.getState().equalsIgnoreCase("entrada"))
                         .mapToInt(Stock::getQuantity)
                         .sum();
 
+
+                // Total de salidas (todos los productos) en este store
                 int salidasStore = store.getStocks().stream()
                         .filter(s -> s.getState().equalsIgnoreCase("salida"))
                         .mapToInt(Stock::getQuantity)
                         .sum();
 
+                // Ocupado = entradas - salidas → lo que realmente hay en el almacén
                 int ocupado = entradasStore - salidasStore;
+
+                // Capacidad restante = capacidad total - ocupado
                 int capacidadRestante = store.getCapacityTotal() - ocupado;
 
+                // Aquí actualizamos la capacidad del store
                 store.setCapacity(ocupado);
                 storeRepository.save(store);
 
+
+                // Actualizamos cuánto falta por retirar
                 restante -= cantidadRetirar;
 
+                // Guardamos en la respuesta
                 respuestaGlobal.add(new StockSalidaResponseDto(
                         store.getId(),
                         cantidadRetirar,
@@ -304,6 +243,7 @@ public class StockServiceImpl implements StockService {
                 ));
             }
 
+            // 🔹 Si no se pudo retirar todo lo solicitado → error
             if (restante > 0) {
                 throw new RuntimeException("No hay suficiente stock del producto "
                         + solicitud.getProductId() + ". Faltan " + restante + " unidades.");
@@ -315,29 +255,6 @@ public class StockServiceImpl implements StockService {
 
 
 //----------------------
-
-
-    @Override
-    public Stock updateById(Long id, StockRequestDto stockRequestDto) {
-        Stock stock = findById(id);
-
-        // Solo actualizamos los campos que vengan no nulos
-        if (stockRequestDto.getStoreId() != null) {
-            stock.setStore(storeService.findStoreById(stockRequestDto.getStoreId()));
-        }
-
-        if (stockRequestDto.getQuantity() != null) {
-            stock.setQuantity(stockRequestDto.getQuantity());
-        }
-
-        if (stockRequestDto.getProductId() != null) {
-            stock.setProductId(stockRequestDto.getProductId());
-        }
-
-        stock.setState("entrada");
-
-        return stockRepository.save(stock);
-    }
 
 
 
