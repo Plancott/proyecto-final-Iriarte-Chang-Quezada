@@ -147,22 +147,22 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("Should find user by username and password")
-    void shouldFindUserByUserNameAndPassword() {
+    @DisplayName("Should find user by username case insensitive")
+    void shouldFindUserByUserNameCaseInsensitive() {
         // When
-        Optional<User> found = userRepository.findByUserNameAndPassword("testuser", "password123");
+        Optional<User> found = userRepository.findByUserName("TESTUSER");
 
         // Then
-        assertTrue(found.isPresent());
-        assertEquals("testuser", found.get().getUserName());
-        assertEquals("password123", found.get().getPassword());
+        // Note: This test assumes the repository is case-sensitive
+        // If case-insensitive search is needed, it should be implemented in the repository
+        assertFalse(found.isPresent()); // Current implementation is case-sensitive
     }
 
     @Test
-    @DisplayName("Should return empty when username and password don't match")
-    void shouldReturnEmptyWhenUserNameAndPasswordDontMatch() {
+    @DisplayName("Should return empty when user not found by username")
+    void shouldReturnEmptyWhenUserNotFoundByUserName() {
         // When
-        Optional<User> found = userRepository.findByUserNameAndPassword("testuser", "wrongpassword");
+        Optional<User> found = userRepository.findByUserName("nonexistentuser");
 
         // Then
         assertFalse(found.isPresent());

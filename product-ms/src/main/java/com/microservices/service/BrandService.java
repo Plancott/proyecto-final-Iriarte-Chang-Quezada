@@ -17,3 +17,4 @@ public interface BrandService {
     // Método interno para obtener la entidad
     Brand getBrandEntityById(Long id);
 }
+

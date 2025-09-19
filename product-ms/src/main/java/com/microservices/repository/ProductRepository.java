@@ -102,3 +102,4 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // Buscar productos activos por marca
     List<Product> findByStatusAndBrandMarcaIdOrderByNameAsc(ProductStatus status, Long brandId);
 }
+

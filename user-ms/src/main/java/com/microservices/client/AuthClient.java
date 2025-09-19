@@ -10,3 +10,4 @@ public interface AuthClient {
     @PostMapping("/api/auth/validate")
     TokenValidationResponse validateToken(@RequestHeader("Authorization") String token);
 }
+

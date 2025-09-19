@@ -26,3 +26,4 @@ public interface BrandMapper {
     @Mapping(target = "products", ignore = true)
     void updateEntityFromDTO(BrandRequestDTO requestDTO, @MappingTarget Brand brand);
 }
+

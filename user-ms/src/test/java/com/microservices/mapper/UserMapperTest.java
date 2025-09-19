@@ -5,12 +5,11 @@ import com.microservices.dto.UserResponseDTO;
 import com.microservices.dto.UserUpdateDTO;
 import com.microservices.entity.User;
 import com.microservices.entity.UserRole;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
 
@@ -23,8 +22,12 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("UserMapper Tests")
 class UserMapperTest {
 
-    @Autowired
     private UserMapper userMapper;
+
+    @BeforeEach
+    void setUp() {
+        userMapper = new UserMapperImpl();
+    }
 
     @Test
     @DisplayName("Should convert UserRequestDTO to User entity")
@@ -77,7 +80,7 @@ class UserMapperTest {
         assertEquals(1L, userResponseDTO.getUserId());
         assertEquals("testuser", userResponseDTO.getUserName());
         assertEquals("test@example.com", userResponseDTO.getEmail());
-        assertNull(userResponseDTO.getPassword()); // Should be ignored for security
+        // Password is not included in UserResponseDTO for security reasons
         assertEquals("Test", userResponseDTO.getName());
         assertEquals("User", userResponseDTO.getLastName());
         assertEquals(UserRole.USER, userResponseDTO.getRole());
@@ -221,8 +224,9 @@ class UserMapperTest {
 
         // Then
         assertNotNull(response);
-        assertNull(response.getPassword()); // Password should be excluded for security
+        // Password is not included in UserResponseDTO for security reasons
         assertEquals("testuser", response.getUserName());
         assertEquals("test@example.com", response.getEmail());
     }
 }
+

@@ -22,3 +22,4 @@ public interface BrandRepository extends JpaRepository<Brand, Long> {
     // Buscar marcas que contengan un texto en el nombre
     List<Brand> findByNombreMarcaContainingIgnoreCase(String nombreMarca);
 }
+

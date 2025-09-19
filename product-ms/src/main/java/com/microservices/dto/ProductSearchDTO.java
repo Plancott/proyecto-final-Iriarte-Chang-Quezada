@@ -22,3 +22,4 @@ public class ProductSearchDTO {
     private String sortBy;
     private String sortDirection;
 }
+

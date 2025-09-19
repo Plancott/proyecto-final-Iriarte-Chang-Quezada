@@ -29,3 +29,4 @@ public class ProductUpdateDTO {
     
     private Long brandId;
 }
+

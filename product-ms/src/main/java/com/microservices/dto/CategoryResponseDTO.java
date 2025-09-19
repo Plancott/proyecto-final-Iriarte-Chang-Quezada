@@ -11,3 +11,4 @@ public class CategoryResponseDTO {
     private Long idCategoria;
     private String nombreCategoria;
 }
+

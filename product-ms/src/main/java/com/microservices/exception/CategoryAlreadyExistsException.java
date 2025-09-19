@@ -10,3 +10,4 @@ public class CategoryAlreadyExistsException extends RuntimeException {
         super(message, cause);
     }
 }
+

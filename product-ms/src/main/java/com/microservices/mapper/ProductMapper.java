@@ -33,3 +33,4 @@ public interface ProductMapper {
     @Mapping(target = "status", ignore = true)
     void updateEntityFromDTO(ProductUpdateDTO updateDTO, @MappingTarget Product product);
 }
+

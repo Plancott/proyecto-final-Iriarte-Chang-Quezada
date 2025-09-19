@@ -460,3 +460,4 @@ class TokenValidationResponseTest {
         assertEquals(789L, response.getUserId());
     }
 }
+

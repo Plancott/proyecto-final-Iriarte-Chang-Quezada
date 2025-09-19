@@ -310,3 +310,4 @@ class UserValidationTest {
                 .anyMatch(v -> v.getPropertyPath().toString().equals("userName")));
     }
 }
+

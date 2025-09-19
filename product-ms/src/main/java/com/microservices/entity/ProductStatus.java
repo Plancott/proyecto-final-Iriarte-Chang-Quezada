@@ -29,3 +29,4 @@ public enum ProductStatus {
         return this == INACTIVE;
     }
 }
+

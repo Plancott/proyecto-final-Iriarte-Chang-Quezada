@@ -134,3 +134,4 @@ class UserResponseDTOTest {
         assertNull(response.getRegisterDate());
     }
 }
+

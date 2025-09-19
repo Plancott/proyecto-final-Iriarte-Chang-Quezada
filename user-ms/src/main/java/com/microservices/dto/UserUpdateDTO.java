@@ -36,3 +36,4 @@ public class UserUpdateDTO {
 
     private UserRole role;
 }
+

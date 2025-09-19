@@ -303,3 +303,4 @@ class UserTest {
         assertEquals(now, fullUser.getRegisterDate());
     }
 }
+

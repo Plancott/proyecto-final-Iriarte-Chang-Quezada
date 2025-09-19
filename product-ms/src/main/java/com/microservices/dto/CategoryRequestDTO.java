@@ -14,3 +14,4 @@ public class CategoryRequestDTO {
     @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s\\-&]+$", message = "El nombre de la categoría solo puede contener letras, espacios, guiones y &")
     private String nombreCategoria;
 }
+

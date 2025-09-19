@@ -17,3 +17,4 @@ public interface CategoryService {
     // Método interno para obtener la entidad
     Category getCategoryEntityById(Long id);
 }
+

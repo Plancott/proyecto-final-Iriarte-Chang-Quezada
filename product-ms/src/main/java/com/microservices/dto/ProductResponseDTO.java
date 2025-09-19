@@ -22,3 +22,4 @@ public class ProductResponseDTO {
     private String brandName;
     private ProductStatus status;
 }
+

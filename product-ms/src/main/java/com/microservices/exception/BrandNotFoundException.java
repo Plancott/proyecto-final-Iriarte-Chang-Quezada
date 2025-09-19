@@ -10,3 +10,4 @@ public class BrandNotFoundException extends RuntimeException {
         super(message, cause);
     }
 }
+

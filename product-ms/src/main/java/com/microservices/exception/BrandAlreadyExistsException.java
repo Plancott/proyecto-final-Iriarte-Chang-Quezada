@@ -10,3 +10,4 @@ public class BrandAlreadyExistsException extends RuntimeException {
         super(message, cause);
     }
 }
+

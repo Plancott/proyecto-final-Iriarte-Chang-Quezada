@@ -22,3 +22,4 @@ public class UserResponseDTO {
     private UserRole role;
     private LocalDateTime registerDate;
 }
+

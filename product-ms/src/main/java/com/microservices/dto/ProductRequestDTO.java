@@ -33,3 +33,4 @@ public class ProductRequestDTO {
     @NotNull(message = "El ID de marca es obligatorio")
     private Long brandId;
 }
+

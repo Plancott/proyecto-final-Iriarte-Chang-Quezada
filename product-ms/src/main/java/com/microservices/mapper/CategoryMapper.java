@@ -26,3 +26,4 @@ public interface CategoryMapper {
     @Mapping(target = "products", ignore = true)
     void updateEntityFromDTO(CategoryRequestDTO requestDTO, @MappingTarget Category category);
 }
+

@@ -14,3 +14,4 @@ public class BrandRequestDTO {
     @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s\\-&.]+$", message = "El nombre de la marca solo puede contener letras, espacios, guiones, & y puntos")
     private String nombreMarca;
 }
+

@@ -79,3 +79,4 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new CategoryNotFoundException("Categoría no encontrada con ID: " + id));
     }
 }
+

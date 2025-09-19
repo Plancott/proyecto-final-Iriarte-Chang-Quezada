@@ -10,3 +10,4 @@ public class CategoryNotFoundException extends RuntimeException {
         super(message, cause);
     }
 }
+

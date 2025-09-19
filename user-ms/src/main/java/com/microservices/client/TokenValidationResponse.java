@@ -16,3 +16,4 @@ public class TokenValidationResponse {
     private String role;
     private Long userId;
 }
+

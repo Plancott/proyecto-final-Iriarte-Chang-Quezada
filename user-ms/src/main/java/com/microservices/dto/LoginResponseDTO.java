@@ -27,3 +27,4 @@ public class LoginResponseDTO {
     private UserRole role;
     private LocalDateTime registerDate;
 }
+

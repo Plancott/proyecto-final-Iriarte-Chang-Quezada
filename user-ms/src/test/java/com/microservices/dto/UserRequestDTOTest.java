@@ -140,24 +140,23 @@ class UserRequestDTOTest {
     }
 
     @Test
-    @DisplayName("Should fail validation with null role")
-    void shouldFailValidationWithNullRole() {
+    @DisplayName("Should pass validation with null role (role is optional)")
+    void shouldPassValidationWithNullRole() {
         // Given
-        UserRequestDTO invalidRequest = UserRequestDTO.builder()
+        UserRequestDTO validRequest = UserRequestDTO.builder()
                 .userName("testuser")
                 .email("test@example.com")
                 .password("password123")
                 .name("Test")
                 .lastName("User")
-                .role(null)
+                .role(null) // Role is optional - will be set to USER by default
                 .build();
 
         // When
-        Set<ConstraintViolation<UserRequestDTO>> violations = validator.validate(invalidRequest);
+        Set<ConstraintViolation<UserRequestDTO>> violations = validator.validate(validRequest);
 
         // Then
-        assertFalse(violations.isEmpty());
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getPropertyPath().toString().equals("role")));
+        assertTrue(violations.isEmpty());
     }
 }
+

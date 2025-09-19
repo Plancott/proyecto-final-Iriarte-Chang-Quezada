@@ -172,3 +172,4 @@ class UserRoleTest {
         assertEquals(originalUserDisplayName, userDisplayName2);
     }
 }
+

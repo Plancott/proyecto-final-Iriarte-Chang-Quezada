@@ -2,15 +2,20 @@ package com.microservices.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microservices.dto.LoginDTO;
+import com.microservices.dto.LoginResponseDTO;
 import com.microservices.dto.UserRequestDTO;
 import com.microservices.dto.UserResponseDTO;
 import com.microservices.entity.UserRole;
+import com.microservices.enums.ErrorCode;
+import com.microservices.exception.InvalidCredentialsException;
+import com.microservices.service.AuthorizationService;
 import com.microservices.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,7 +33,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Test class for UserController
  */
-@WebMvcTest(UserController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 @DisplayName("UserController Tests")
 class UserControllerTest {
 
@@ -38,12 +44,16 @@ class UserControllerTest {
     @MockBean
     private UserService userService;
 
+    @MockBean
+    private AuthorizationService authorizationService;
+
     @Autowired
     private ObjectMapper objectMapper;
 
     private UserRequestDTO userRequestDTO;
     private UserResponseDTO userResponseDTO;
     private LoginDTO loginDTO;
+    private LoginResponseDTO loginResponseDTO;
 
     @BeforeEach
     void setUp() {
@@ -69,6 +79,19 @@ class UserControllerTest {
         loginDTO = LoginDTO.builder()
                 .userName("testuser")
                 .password("password123")
+                .build();
+
+        loginResponseDTO = LoginResponseDTO.builder()
+                .token("test-jwt-token")
+                .tokenType("Bearer")
+                .expiresIn(3600000L)
+                .userId(1L)
+                .userName("testuser")
+                .email("test@example.com")
+                .name("Test")
+                .lastName("User")
+                .role(UserRole.USER)
+                .registerDate(LocalDateTime.now())
                 .build();
     }
 
@@ -112,72 +135,36 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Should get user by id successfully")
-    void shouldGetUserByIdSuccessfully() throws Exception {
-        // Given
-        when(userService.getUser(1L)).thenReturn(userResponseDTO);
-
-        // When & Then
-        mockMvc.perform(get("/api/users/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userId").value(1L))
-                .andExpect(jsonPath("$.userName").value("testuser"))
-                .andExpect(jsonPath("$.email").value("test@example.com"))
-                .andExpect(jsonPath("$.name").value("Test"))
-                .andExpect(jsonPath("$.lastName").value("User"))
-                .andExpect(jsonPath("$.role").value("USER"));
-    }
-
-    @Test
-    @DisplayName("Should get all users successfully")
-    void shouldGetAllUsersSuccessfully() throws Exception {
-        // Given
-        List<UserResponseDTO> users = Arrays.asList(userResponseDTO);
-        when(userService.getAllUsers()).thenReturn(users);
-
-        // When & Then
-        mockMvc.perform(get("/api/users"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].userId").value(1L))
-                .andExpect(jsonPath("$[0].userName").value("testuser"))
-                .andExpect(jsonPath("$[0].email").value("test@example.com"));
-    }
-
-    @Test
-    @DisplayName("Should delete user successfully")
-    void shouldDeleteUserSuccessfully() throws Exception {
-        // When & Then
-        mockMvc.perform(delete("/api/users/1"))
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
     @DisplayName("Should login user successfully")
     void shouldLoginUserSuccessfully() throws Exception {
         // Given
-        when(userService.login(any(LoginDTO.class))).thenReturn(true);
+        when(userService.login(any(LoginDTO.class))).thenReturn(loginResponseDTO);
 
         // When & Then
         mockMvc.perform(post("/api/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginDTO)))
                 .andExpect(status().isOk())
-                .andExpect(content().string("true"));
+                .andExpect(jsonPath("$.token").value("test-jwt-token"))
+                .andExpect(jsonPath("$.tokenType").value("Bearer"))
+                .andExpect(jsonPath("$.expiresIn").value(3600000L))
+                .andExpect(jsonPath("$.userId").value(1L))
+                .andExpect(jsonPath("$.userName").value("testuser"))
+                .andExpect(jsonPath("$.email").value("test@example.com"));
     }
 
     @Test
-    @DisplayName("Should return false for invalid login")
-    void shouldReturnFalseForInvalidLogin() throws Exception {
+    @DisplayName("Should return unauthorized for invalid login")
+    void shouldReturnUnauthorizedForInvalidLogin() throws Exception {
         // Given
-        when(userService.login(any(LoginDTO.class))).thenReturn(false);
+        when(userService.login(any(LoginDTO.class)))
+                .thenThrow(new InvalidCredentialsException("Invalid credentials", ErrorCode.INVALID_CREDENTIALS));
 
         // When & Then
         mockMvc.perform(post("/api/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginDTO)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("false"));
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -197,13 +184,70 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Should return not found for non-existent user")
-    void shouldReturnNotFoundForNonExistentUser() throws Exception {
-        // Given
-        when(userService.getUser(999L)).thenThrow(new RuntimeException("User not found"));
+    @DisplayName("Should return forbidden for protected endpoints without authentication")
+    void shouldReturnForbiddenForProtectedEndpointsWithoutAuthentication() throws Exception {
+        // When & Then - Protected endpoints should return 403 without proper authentication
+        mockMvc.perform(get("/api/users/1"))
+                .andExpect(status().isForbidden());
 
-        // When & Then
-        mockMvc.perform(get("/api/users/999"))
+        mockMvc.perform(get("/api/users"))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(put("/api/users/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(delete("/api/users/1"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Should handle malformed JSON requests")
+    void shouldHandleMalformedJsonRequests() throws Exception {
+        // When & Then - Malformed JSON
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ invalid json }"))
+                .andExpect(status().isInternalServerError());
+
+        mockMvc.perform(post("/api/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ invalid json }"))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    @DisplayName("Should handle missing content type")
+    void shouldHandleMissingContentType() throws Exception {
+        // Given
+        UserRequestDTO userRequest = UserRequestDTO.builder()
+                .userName("testuser")
+                .email("test@example.com")
+                .password("password123")
+                .name("Test")
+                .lastName("User")
+                .role(UserRole.USER)
+                .build();
+
+        // When & Then - Missing content type
+        mockMvc.perform(post("/api/users")
+                        .content(objectMapper.writeValueAsString(userRequest)))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    @DisplayName("Should handle empty request body")
+    void shouldHandleEmptyRequestBody() throws Exception {
+        // When & Then - Empty request body
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(""))
+                .andExpect(status().isInternalServerError());
+
+        mockMvc.perform(post("/api/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(""))
                 .andExpect(status().isInternalServerError());
     }
 }

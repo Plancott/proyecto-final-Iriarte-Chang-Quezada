@@ -79,3 +79,4 @@ public class BrandServiceImpl implements BrandService {
                 .orElseThrow(() -> new BrandNotFoundException("Marca no encontrada con ID: " + id));
     }
 }
+

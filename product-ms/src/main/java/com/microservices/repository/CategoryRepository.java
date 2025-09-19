@@ -22,3 +22,4 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     // Buscar categorías que contengan un texto en el nombre
     List<Category> findByNombreCategoriaContainingIgnoreCase(String nombreCategoria);
 }
+
