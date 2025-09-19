@@ -13,4 +13,10 @@ public class StoreRequestDto {
 
     @Min(value = 1, message = "La capacidad total debe ser al menos 1")
     private Integer capacityTotal;
+
+    public StoreRequestDto(String name, Integer capacityTotal) {
+        this.name = name;
+        this.capacityTotal = capacityTotal;
+    }
+    public StoreRequestDto() {}
 }

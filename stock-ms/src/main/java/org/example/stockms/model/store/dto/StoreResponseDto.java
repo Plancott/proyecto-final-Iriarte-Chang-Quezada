@@ -14,4 +14,14 @@ public class StoreResponseDto {
     private Integer capacity;
     private Integer capacityTotal;
     private List<Stock> stocks;
+
+    public StoreResponseDto(Integer id, String name, Integer capacity, Integer capacityTotal, List<Stock> stocks) {
+        this.id = id;
+        this.name = name;
+        this.capacity = capacity;
+        this.capacityTotal = capacityTotal;
+        this.stocks = stocks;
+    }
+
+    public StoreResponseDto() {}
 }

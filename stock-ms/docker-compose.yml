@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  stock-ms:
+    image: stock-ms:latest   # La imagen que construiste con tu Dockerfile
+    container_name: stock-ms
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"          # Expone el puerto de tu app
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:stock-db
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    container_name: stock-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: stockdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - stock-db-data:/var/lib/postgresql/data
+
+volumes:
+  stock-db-data:

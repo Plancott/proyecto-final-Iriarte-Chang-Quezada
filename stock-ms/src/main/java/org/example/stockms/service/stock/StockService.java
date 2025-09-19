@@ -16,9 +16,6 @@ public interface StockService {
     // Obtener todos
     List<Stock> findAll();
 
-    //Eliminar un stock
-    void deleteById(Long id);
-
     //Buscar entradas y salidad de un producto en especificoy saber cuanto hay en total
     StockFindProductDto findByProductId(Long productId);
 }

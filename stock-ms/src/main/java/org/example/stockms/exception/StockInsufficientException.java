@@ -4,12 +4,12 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class StockInsufficientStockException extends RuntimeException {
+public class StockInsufficientException extends RuntimeException {
     private final Long productId;
     private final Integer remaining;
     private final LocalDateTime timestamp;
 
-    public StockInsufficientStockException(Long productId, Integer remaining) {
+    public StockInsufficientException(Long productId, Integer remaining) {
         super("No hay suficiente stock del producto " + productId + ". Faltan " + remaining + " unidades.");
         this.productId = productId;
         this.remaining = remaining;

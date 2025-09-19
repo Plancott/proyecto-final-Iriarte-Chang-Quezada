@@ -3,7 +3,7 @@ package org.example.stockms.exception;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-
+//Cuando se intenta eliminar un stock que tiene capacity aún
 @Getter
 public class StoreNotEmptyException extends RuntimeException {
     private final Long storeId;

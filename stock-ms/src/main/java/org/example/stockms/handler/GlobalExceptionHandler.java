@@ -1,9 +1,6 @@
 package org.example.stockms.handler;
 
-import org.example.stockms.exception.InvalidStockRequestException;
-import org.example.stockms.exception.ProductNotFoundException;
-import org.example.stockms.exception.StockInsufficientStockException;
-import org.example.stockms.exception.StoreNotEmptyException;
+import org.example.stockms.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -13,20 +10,6 @@ import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(StoreNotEmptyException.class)
-    public ResponseEntity<Map<String, Object>> handleStoreNotEmpty(StoreNotEmptyException ex) {
-        Map<String, Object> body = Map.of(
-                "status", HttpStatus.CONFLICT.value(),
-                "error", "StoreNotEmpty",
-                "storeId", ex.getStoreId(),
-                "remainingCapacity", ex.getCapacity(),
-                "timestamp", ex.getTimestamp(),
-                "message", "No se puede eliminar el almacén porque aún contiene stock"
-        );
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
-    }
-
     @ExceptionHandler(InvalidStockRequestException.class)
     public ResponseEntity<Map<String, Object>> handleInvalidStockRequest(InvalidStockRequestException ex) {
         Map<String, Object> body = Map.of(
@@ -52,8 +35,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
-    @ExceptionHandler(StockInsufficientStockException.class)
-    public ResponseEntity<Map<String, Object>> handleInsufficientStock(StockInsufficientStockException ex) {
+    @ExceptionHandler(StockInsufficientException.class)
+    public ResponseEntity<Map<String, Object>> handleInsufficientStock(StockInsufficientException ex) {
         Map<String, Object> body = Map.of(
                 "status", HttpStatus.CONFLICT.value(),
                 "error", "StockInsufficient",
@@ -64,5 +47,32 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
+    @ExceptionHandler(StoreNotEmptyException.class)
+    public ResponseEntity<Map<String, Object>> handleStoreNotEmpty(StoreNotEmptyException ex) {
+        Map<String, Object> body = Map.of(
+                "status", HttpStatus.CONFLICT.value(),
+                "error", "StoreNotEmpty",
+                "storeId", ex.getStoreId(),
+                "remainingCapacity", ex.getCapacity(),
+                "timestamp", ex.getTimestamp(),
+                "message", "No se puede eliminar el almacén porque aún contiene stock"
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
+    @ExceptionHandler(StoreNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleStoreNotFound(StoreNotFoundException ex) {
+        Map<String, Object> body = Map.of(
+                "status", HttpStatus.NOT_FOUND.value(),
+                "error", "StoreNotFound",
+                "storeId", ex.getStoreId(),
+                "timestamp", ex.getTimestamp(),
+                "message", ex.getMessage()
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 }

@@ -9,9 +9,16 @@ import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 public class StoreCantidadProductoAlmacenDto {
     private Long storeId;
     private List<StoreProductQuantityDto> productos;
+
+    // Constructor vacío
+    public StoreCantidadProductoAlmacenDto() {}
+
+    // Constructor explícito
+    public StoreCantidadProductoAlmacenDto(Long storeId, List<StoreProductQuantityDto> productos) {
+        this.storeId = storeId;
+        this.productos = productos;
+    }
 }
