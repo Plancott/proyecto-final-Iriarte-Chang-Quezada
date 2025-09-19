@@ -18,28 +18,22 @@ FROM eclipse-temurin:21-jdk-alpine AS builder
 
 WORKDIR /app
 
-# Copiar archivos de Maven
-COPY stock-ms/pom.xml .
-COPY stock-ms/.mvn .mvn
-COPY stock-ms/mvnw .
+# Copiar archivos Maven
+COPY pom.xml .
+COPY .mvn .mvn
+COPY mvnw .
 
 RUN chmod +x mvnw
 
-# Copiar código fuente de stock-ms
-COPY stock-ms/src ./src
+# Copiar código fuente
+COPY src ./src
 
-# Construir el proyecto
+# Construir
 RUN ./mvnw clean package -DskipTests
 
-# ==========================
 # Etapa final
-# ==========================
 FROM eclipse-temurin:21-jdk-alpine
-
 WORKDIR /app
-
 COPY --from=builder /app/target/*.jar app.jar
-
 EXPOSE 8080
-
 ENTRYPOINT ["java","-jar","app.jar"]
