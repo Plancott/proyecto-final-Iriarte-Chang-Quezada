@@ -78,7 +78,7 @@ class GlobalExceptionHandlerTest {
     @DisplayName("Should handle ProductNotFoundException correctly")
     void testHandleProductNotFound_Success() {
         // Given
-        Integer productId = 999;
+        Long productId = 999L;
         ProductNotFoundException exception = new ProductNotFoundException(productId);
 
         // When
@@ -103,7 +103,7 @@ class GlobalExceptionHandlerTest {
         // Given
         Long productId = 1L;
         Integer remaining = 25;
-        StockInsufficientStockException exception = new StockInsufficientStockException(productId, remaining);
+        StockInsufficientException exception = new StockInsufficientException(productId, remaining);
 
         // When
         ResponseEntity<Map<String, Object>> response = globalExceptionHandler.handleInsufficientStock(exception);
@@ -166,7 +166,7 @@ class GlobalExceptionHandlerTest {
     @DisplayName("Should handle ProductNotFoundException with zero product ID")
     void testHandleProductNotFound_ZeroProductId_Success() {
         // Given
-        Integer productId = 0;
+        Long productId = 0L;
         ProductNotFoundException exception = new ProductNotFoundException(productId);
 
         // When
@@ -178,7 +178,7 @@ class GlobalExceptionHandlerTest {
         
         Map<String, Object> body = response.getBody();
         assertThat(body).isNotNull();
-        assertThat(body.get("productId")).isEqualTo(0);
+        assertThat(body.get("productId")).isEqualTo(0L);
     }
 
     @Test
@@ -187,7 +187,7 @@ class GlobalExceptionHandlerTest {
         // Given
         Long productId = 5L;
         Integer remaining = 0;
-        StockInsufficientStockException exception = new StockInsufficientStockException(productId, remaining);
+        StockInsufficientException exception = new StockInsufficientException(productId, remaining);
 
         // When
         ResponseEntity<Map<String, Object>> response = globalExceptionHandler.handleInsufficientStock(exception);
@@ -227,7 +227,7 @@ class GlobalExceptionHandlerTest {
         // Given
         Long productId = 7L;
         Integer remaining = -5;
-        StockInsufficientStockException exception = new StockInsufficientStockException(productId, remaining);
+        StockInsufficientException exception = new StockInsufficientException(productId, remaining);
 
         // When
         ResponseEntity<Map<String, Object>> response = globalExceptionHandler.handleInsufficientStock(exception);
@@ -249,8 +249,8 @@ class GlobalExceptionHandlerTest {
         
         StoreNotEmptyException storeException = new StoreNotEmptyException(1L, 50);
         InvalidStockRequestException invalidException = new InvalidStockRequestException("Test message");
-        ProductNotFoundException productException = new ProductNotFoundException(123);
-        StockInsufficientStockException stockException = new StockInsufficientStockException(1L, 10);
+        ProductNotFoundException productException = new ProductNotFoundException(123L);
+        StockInsufficientException stockException = new StockInsufficientException(1L, 10);
         
         LocalDateTime afterTest = LocalDateTime.now();
 
@@ -280,8 +280,8 @@ class GlobalExceptionHandlerTest {
         // Given
         StoreNotEmptyException storeException = new StoreNotEmptyException(1L, 50);
         InvalidStockRequestException invalidException = new InvalidStockRequestException("Test");
-        ProductNotFoundException productException = new ProductNotFoundException(123);
-        StockInsufficientStockException stockException = new StockInsufficientStockException(1L, 10);
+        ProductNotFoundException productException = new ProductNotFoundException(123L);
+        StockInsufficientException stockException = new StockInsufficientException(1L, 10);
 
         // When
         ResponseEntity<Map<String, Object>> storeResponse = globalExceptionHandler.handleStoreNotEmpty(storeException);

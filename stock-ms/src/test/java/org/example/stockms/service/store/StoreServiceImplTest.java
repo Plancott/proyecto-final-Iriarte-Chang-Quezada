@@ -160,7 +160,7 @@ class StoreServiceImplTest {
         // When & Then
         assertThatThrownBy(() -> storeService.findStoreById(storeId))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Store not found");
+                .hasMessage("Almacén con id " + storeId+" no encontrado");
     }
 
     @Test
@@ -209,7 +209,7 @@ class StoreServiceImplTest {
         // When & Then
         assertThatThrownBy(() -> storeService.deleteStoreById(storeId))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Store no encontrada");
+                .hasMessage("Almacén con id "+ storeId + " no encontrado");
         
         verify(storeRepository).findById(storeId);
         verify(storeRepository, never()).deleteById(anyLong());

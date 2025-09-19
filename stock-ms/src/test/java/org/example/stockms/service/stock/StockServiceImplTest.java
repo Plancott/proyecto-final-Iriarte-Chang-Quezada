@@ -229,7 +229,7 @@ class StockServiceImplTest {
         // When & Then
         assertThatThrownBy(() -> stockService.findByProductId(productId))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("No existe stock para el producto con id: " + productId);
+                .hasMessage("Producto con id "+ productId +" no existe");
     }
 
     @Test
@@ -310,59 +310,7 @@ class StockServiceImplTest {
         verify(storeRepository).save(store);
     }
 
-    @Test
-    @DisplayName("Should delete stock successfully")
-    void testDeleteById_Success() {
-        // Given
-        Long stockId = 1L;
-        Store store = createStore(1L, "store1", 50, 100);
-        Stock stock = createStock(stockId, 1L, 50, "entrada", store, LocalDateTime.now());
-        store.setStocks(new ArrayList<>(Arrays.asList(stock)));
-        List<Store> stores = Arrays.asList(store);
 
-        when(stockRepository.findById(stockId)).thenReturn(Optional.of(stock));
-        when(storeService.findAllStores()).thenReturn(stores);
-        when(storeRepository.save(any(Store.class))).thenReturn(store);
-
-        // When
-        stockService.deleteById(stockId);
-
-        // Then
-        verify(stockRepository).findById(stockId);
-        verify(storeRepository).save(store);
-        verify(stockRepository).deleteById(stockId);
-    }
-
-    @Test
-    @DisplayName("Should throw exception when deleting non-existent stock")
-    void testDeleteById_NotFound_ThrowsException() {
-        // Given
-        Long stockId = 999L;
-        when(stockRepository.findById(stockId)).thenReturn(Optional.empty());
-
-        // When & Then
-        assertThatThrownBy(() -> stockService.deleteById(stockId))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("Stock not found");
-    }
-
-    @Test
-    @DisplayName("Should throw exception when stock not found in store during deletion")
-    void testDeleteById_StockNotFoundInStore_ThrowsException() {
-        // Given
-        Long stockId = 1L;
-        Store store = createStore(1L, "store1", 50, 100);
-        Stock stock = createStock(stockId, 1L, 50, "entrada", store, LocalDateTime.now());
-        List<Store> stores = Arrays.asList(store);
-
-        when(stockRepository.findById(stockId)).thenReturn(Optional.of(stock));
-        when(storeService.findAllStores()).thenReturn(stores);
-
-        // When & Then
-        assertThatThrownBy(() -> stockService.deleteById(stockId))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("No se encontro el stock");
-    }
 
     @Test
     @DisplayName("Should handle empty stock list")

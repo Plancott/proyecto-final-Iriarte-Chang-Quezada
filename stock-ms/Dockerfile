@@ -23,7 +23,7 @@ COPY pom.xml .
 COPY .mvn .mvn
 COPY mvnw .
 
-RUN chmod +x mvnw
+RUN chmod +x ./mvnw
 
 # Copiar código fuente
 COPY src ./src
