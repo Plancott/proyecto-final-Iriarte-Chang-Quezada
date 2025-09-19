@@ -6,7 +6,7 @@ services:
     container_name: stock-ms
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ../Dockerfile
     ports:
       - "8080:8080"          # Expone el puerto de tu app
     environment:
