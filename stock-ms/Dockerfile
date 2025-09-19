@@ -18,7 +18,7 @@ FROM eclipse-temurin:21-jdk-alpine AS builder
 
 WORKDIR /app
 
-# Copiar archivos de Maven del módulo stock-ms
+# Copiar archivos de Maven
 COPY stock-ms/pom.xml .
 COPY stock-ms/.mvn .mvn
 COPY stock-ms/mvnw .
@@ -38,7 +38,6 @@ FROM eclipse-temurin:21-jdk-alpine
 
 WORKDIR /app
 
-# Copiar el jar generado
 COPY --from=builder /app/target/*.jar app.jar
 
 EXPOSE 8080
