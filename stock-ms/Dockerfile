@@ -16,35 +16,31 @@
 # ==========================
 FROM eclipse-temurin:21-jdk-alpine AS builder
 
-# Directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Copiar archivos de Maven
-COPY pom.xml .
-COPY .mvn .mvn
-COPY mvnw .
+# Copiar archivos de Maven del módulo stock-ms
+COPY stock-ms/pom.xml .
+COPY stock-ms/.mvn .mvn
+COPY stock-ms/mvnw .
 
-# Dar permisos al wrapper (soluciona "Permission denied")
 RUN chmod +x mvnw
 
-# Copiar el resto del proyecto
-COPY src ./src
+# Copiar código fuente de stock-ms
+COPY stock-ms/src ./src
 
-# Ejecutar build de Maven (con skip tests)
+# Construir el proyecto
 RUN ./mvnw clean package -DskipTests
 
 # ==========================
-# Etapa 2: Imagen final
+# Etapa final
 # ==========================
 FROM eclipse-temurin:21-jdk-alpine
 
 WORKDIR /app
 
-# Copiar el jar generado de la etapa builder
+# Copiar el jar generado
 COPY --from=builder /app/target/*.jar app.jar
 
-# Puerto expuesto
 EXPOSE 8080
 
-# Comando de arranque
 ENTRYPOINT ["java","-jar","app.jar"]
