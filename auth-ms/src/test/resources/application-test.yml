@@ -1,0 +1,21 @@
+server:
+  port: 0  # Puerto aleatorio para tests
+
+spring:
+  application:
+    name: auth-ms-test
+
+# Configuración de JWT para tests
+jwt:
+  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  expiration: 3600000 # 1 hora para tests
+
+# Configuración de logging para tests
+logging:
+  level:
+    com.microservices.auth: DEBUG
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+    org.springframework.test: WARN
+    org.springframework.boot: WARN
+

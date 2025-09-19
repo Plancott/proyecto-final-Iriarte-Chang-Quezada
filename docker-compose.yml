@@ -1,0 +1,196 @@
+services:
+  # Base de datos de Product
+  product-db:
+    image: postgres:15
+    container_name: product-db
+    environment:
+      POSTGRES_DB: productdb
+      POSTGRES_USER: product_user
+      POSTGRES_PASSWORD: product_pass
+    ports:
+      - "5437:5432"
+    volumes:
+      - product_db_data:/var/lib/postgresql/data
+    networks:
+      - micro_net
+
+  # Microservicio de Product
+  product-ms:
+    build: ./product-ms
+    container_name: product-ms
+    env_file:
+      - ./product-ms/.env
+    depends_on:
+      - product-db
+      - auth-ms
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      CLOUDINARY_CLOUD_NAME: dftuya11k
+      CLOUDINARY_API_KEY: 987835277476446
+      CLOUDINARY_API_SECRET: aPnzUON0lQthnsJW1sYNbLUNcH8
+      CLOUDINARY_UPLOAD_PRESET: product-images
+    ports:
+      - "8078:8078"
+    networks:
+      - micro_net
+
+  eureka-server:
+    build: ./eurekaServer
+    container_name: eureka-server
+    ports:
+      - "8091:8091"
+    networks:
+      - micro_net
+
+  auth-db:
+    image: postgres:15
+    container_name: auth-db
+    environment:
+      POSTGRES_DB: authdb
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_pass
+    ports:
+      - "5436:5432"
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+    networks:
+      - micro_net
+
+  auth-ms:
+    build: ./auth-ms
+    container_name: auth-ms
+    depends_on:
+      - auth-db
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8079:8079"
+    networks:
+      - micro_net
+  # Base de datos de User
+  user-db:
+    image: postgres:15
+    container_name: user-db
+    environment:
+      POSTGRES_DB: userdb
+      POSTGRES_USER: user_user
+      POSTGRES_PASSWORD: user_pass
+    ports:
+      - "5435:5432"
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+    networks:
+      - micro_net
+
+  # Microservicio de User
+  user-ms:
+    build: ./user-ms
+    container_name: user-ms
+    depends_on:
+      - user-db
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8081:8081"
+    networks:
+      - micro_net
+  orders-db:
+    image: postgres:15
+    container_name: orders-db
+    environment:
+      POSTGRES_DB: ordersdb
+      POSTGRES_USER: orders_user
+      POSTGRES_PASSWORD: orders_pass
+    ports:
+      - "5438:5432"
+    networks:
+      - micro_net
+
+  api-gateway:
+    build: ./apiGateway-ms  # Ruta donde tienes el proyecto del gateway
+    container_name: api-gateway
+    depends_on:
+      - eureka-server
+      - stock-ms
+      - stock-db
+    ports:
+      - "9090:9090"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8091/eureka/
+    networks:
+      - micro_net
+
+  order-ms:
+    build: ./orders-ms
+    container_name: orders-ms
+    depends_on:
+      - orders-db
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8083:8082"
+    networks:
+      - micro_net
+
+  chat-db:
+    image: postgres:15
+    container_name: chat-db
+    environment:
+      POSTGRES_DB: chatdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - chat_db_data:/var/lib/postgresql/data
+    networks:
+      - micro_net
+
+  chat-ms:
+    build: ./chatService-ms
+    container_name: chatService-ms
+    depends_on:
+      - chat-db
+    env_file:
+      - ./chatService-ms/.env
+    ports:
+      - "8088:8086"
+    networks:
+      - micro_net
+
+  stock-ms:
+    build: ./stock-ms
+    image: stock-ms:latest
+    container_name: stock-ms
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: render
+    depends_on:
+      - stock-db
+    networks:
+      - micro_net
+
+  stock-db:
+    image: postgres:15
+    container_name: stock-db
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: stockdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - stock-db-data:/var/lib/postgresql/data
+    networks:
+      - micro_net
+volumes:
+  stock-db-data:
+  chat_db_data:
+  user_db_data:
+  auth_db_data:
+  product_db_data:
+
+networks:
+  micro_net:
+    driver: bridge

@@ -24,6 +24,8 @@ public interface OrderMapper {
 
     OrderResponseDto toOrderResponseDto(Order order);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "order", ignore = true)
     DetailOrder toDetailEntity(DetailOrderRequestDto request);
 
     DetailOrderResponseDto toDetailResponse(DetailOrder entity);

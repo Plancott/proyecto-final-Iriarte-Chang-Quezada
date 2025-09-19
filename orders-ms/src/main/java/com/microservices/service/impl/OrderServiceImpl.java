@@ -36,6 +36,10 @@ public class OrderServiceImpl implements OrderService {
         Optional<Order> existingCart = orderRepository.findByUserIdAndState
                 (order.getUserId(), StateOrder.CARRITO);
 
+        if (order.getDetails() == null || order.getDetails().isEmpty()) {
+            throw new InvalidQuantityException("Order must have at least one product");
+        }
+
         if (existingCart.isPresent()) {
             Order cart = existingCart.get();
 

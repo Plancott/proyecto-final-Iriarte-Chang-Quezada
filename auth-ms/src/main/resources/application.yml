@@ -1,0 +1,44 @@
+server:
+  port: 8079
+
+spring:
+  application:
+    name: auth-ms
+
+  datasource:
+    url: jdbc:postgresql://auth-db:5432/authdb
+    driverClassName: org.postgresql.Driver
+    username: auth_user
+    password: auth_pass
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # en dev, en prod usa validate o none
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  data:
+    jpa:
+      repositories:
+        enabled: true
+
+# Configuración de JWT
+jwt:
+  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  expiration: 86400000 # 24 horas en milisegundos
+
+# Configuración de logging
+logging:
+  level:
+    com.microservices.auth: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.cloud.openfeign: DEBUG
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8091/eureka/
