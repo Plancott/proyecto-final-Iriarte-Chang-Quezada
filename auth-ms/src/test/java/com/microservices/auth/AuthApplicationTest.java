@@ -25,7 +25,16 @@ class AuthApplicationTest {
     @Test
     void testMainMethod_WithNullArgs_ShouldThrowException() {
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> AuthApplication.main(null));
+        // Spring Boot valida que los argumentos no sean null
+        assertThrows(IllegalArgumentException.class, () -> {
+            try {
+                AuthApplication.main(null);
+            } catch (IllegalArgumentException e) {
+                // Verificar que el mensaje de error es el esperado
+                assertTrue(e.getMessage().contains("'args' must not be null"));
+                throw e;
+            }
+        });
     }
 
     @Test

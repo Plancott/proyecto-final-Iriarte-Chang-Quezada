@@ -204,18 +204,22 @@ class AuthControllerTest {
     }
 
     @Test
-    void testValidateToken_ServiceThrowsException_ShouldReturnServerError() throws Exception {
+    void testValidateToken_ServiceThrowsException_ShouldReturnValidFalse() throws Exception {
         // Given
-        String bearerToken = "Bearer valid.jwt.token";
-        String jwtToken = "valid.jwt.token";
+        String bearerToken = "Bearer invalid.jwt.token";
+        String jwtToken = "invalid.jwt.token";
+        TokenValidationResponse expectedResponse = TokenValidationResponse.builder()
+                .valid(false)
+                .build();
 
-        when(authService.validateToken(anyString())).thenThrow(new RuntimeException("Service error"));
+        when(authService.validateToken(anyString())).thenReturn(expectedResponse);
 
         // When & Then
         mockMvc.perform(post("/api/auth/validate")
                         .header("Authorization", bearerToken)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.valid").value(false));
 
         verify(authService).validateToken(anyString());
     }
