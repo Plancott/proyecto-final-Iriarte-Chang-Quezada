@@ -1,0 +1,60 @@
+server:
+  port: 9090
+
+spring:
+  application:
+    name: apiGateway-ms
+  cloud:
+    gateway:
+      routes:
+        - id: auth-ms
+          uri: lb://AUTH-MS
+          predicates:
+            - Path=/api/auth/**
+
+        - id: product-ms
+          uri: lb://PRODUCT-MS
+          predicates:
+            - Path=/api/brands/**
+
+        - id: product-ms
+          uri: lb://PRODUCT-MS
+          predicates:
+            - Path=/api/categories/**
+
+        - id: product-ms
+          uri: lb://PRODUCT-MS
+          predicates:
+            - Path=/api/products/**
+
+        - id: stock-ms
+          uri: lb://STOCK-MS
+          predicates:
+            - Path=/api/stock/**
+
+        - id: store-ms
+          uri: lb://STOCK-MS
+          predicates:
+            - Path=/api/store/**
+
+        - id: user-ms
+          uri: lb://USER-MS
+          predicates:
+            - Path=/api/users/**
+
+        - id: orders-ms
+          uri: lb://ORDERS-MS
+          predicates:
+            - Path=/api/orders/**
+
+        - id: chatService-ms
+          uri: lb://CHATSERVICE-MS
+          predicates:
+            - Path=/api/chatAI/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8091/eureka/
+    register-with-eureka: true
+    fetch-registry: true

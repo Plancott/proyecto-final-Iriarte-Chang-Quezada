@@ -1,0 +1,36 @@
+server:
+  port: 0 # Puerto aleatorio para tests
+
+spring:
+  application:
+    name: user-ms-test
+  
+  # Configuración de la base de datos H2 para testing
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driverClassName: org.h2.Driver
+    username: sa
+    password: 
+  
+  # Configuración de JPA para testing
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+  
+  # Configuración de auditoría
+  data:
+    jpa:
+      repositories:
+        enabled: true
+
+# Configuración de logging para testing
+logging:
+  level:
+    com.microservices: INFO
+    org.springframework.web: WARN
+    org.hibernate.SQL: WARN

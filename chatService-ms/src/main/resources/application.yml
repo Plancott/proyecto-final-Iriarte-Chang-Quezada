@@ -1,0 +1,27 @@
+server:
+  port: 8086
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+  application:
+    name: chatService-ms
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+
+openai:
+  base-url: https://api.openai.com/v1
+  api-key: ${OPENAI_API_KEY}
+  model: gpt-4o-mini
+  timeout-seconds: 60
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8091/eureka/
